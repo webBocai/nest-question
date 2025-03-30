@@ -8,10 +8,16 @@ export class StatService {
     private readonly answerService: AnswerService,
     private readonly questionService: QuestionService,
   ) {}
+
+  /**
+   * 根据选项值获取选项文本
+   * @param value 选项值
+   * @param options 选项数组
+   * @returns 选项文本，如果未找到则返回'--'
+   */
   private _getOptText(value: string, options: any[]) {
     let text = '';
     console.log('options', options);
-
     console.log('value', value);
 
     options.forEach((item) => {
@@ -23,6 +29,13 @@ export class StatService {
 
     return text || '--';
   }
+
+  /**
+   * 生成答案信息对象
+   * @param question 问题对象
+   * @param awswerList 答案列表
+   * @returns 处理后的答案信息对象
+   */
   private _genAnswersInfo(question, awswerList = []) {
     const res = {};
     const { componentList = [] } = question;
@@ -49,6 +62,13 @@ export class StatService {
 
     return res;
   }
+
+  /**
+   * 获取问题统计列表和总数
+   * @param id 问题ID
+   * @param opt 分页选项
+   * @returns 包含列表和总数的对象
+   */
   async getQuestionStaListAndCount(
     id: string,
     opt: { page: number; pageSize: number },
@@ -69,6 +89,13 @@ export class StatService {
     });
     return { list: answersInfoList, total };
   }
+
+  /**
+   * 获取组件统计数据
+   * @param id 问题ID
+   * @param componentId 组件ID
+   * @returns 组件统计数据数组
+   */
   async getComponentStat(id: string, componentId: string) {
     if (!id || !componentId) return [];
     const q = await this.questionService.findOne(id);
@@ -88,6 +115,8 @@ export class StatService {
       page: 1,
       pageSize: total,
     });
+
+    // 统计每个选项的计数
     const countInfo = {};
     const length = list.length;
     for (let i = 0; i < length; i++) {
@@ -104,6 +133,7 @@ export class StatService {
       });
     }
 
+    // 转换为统计列表
     const countList: any[] = [];
     for (const key in countInfo) {
       let text = '';
